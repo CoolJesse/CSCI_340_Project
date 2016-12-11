@@ -36,9 +36,11 @@ class PriorityPCBQueue
 		
 		void add(int thePriority, int thePCB_ID); //Postconditiion:item has been added to the back of queue
 		
-		int remove(); //Precondition: the queue is not empty. Returns the item at front of queue
+		int remove(); //Precondition: the queue is not empty. Returns the PCB_ID of the item at front of queue
 		             //and removes it
 		bool isEmpty() const; //returns true only if queue is empty
+		
+		void readContents() const;
 		
 	private:
 		PriorityPCBNode* head; //points to head of queue
