@@ -39,6 +39,8 @@ class PCBQueue
 		             //and removes it
 		bool isEmpty() const; //returns true only if queue is empty
 		
+		void readContents() const; //ouputs contents of queue
+		
 	private:
 		string deviceName; //the name assigned by the OS to the device queue
 		PCBNode* head; //points to head of queue

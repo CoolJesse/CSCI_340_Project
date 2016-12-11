@@ -93,3 +93,14 @@ bool PCBQueue::isEmpty() const //test to see if queue is empty
 	else              // if head ptr does not point to nullptr then it points to a node and the queue is not empty
 		return false;
 }
+void PCBQueue::readContents() const
+{	if(head == nullptr)
+	{	cout << "Queue is empty\n";
+	}
+	else
+	{	for(PCBNode* reader = head; reader != nullptr; reader = reader->getNext())
+		{	cout << "Process ID:"<< reader->getPCB_ID() << endl;
+		}		
+	}	
+}
+

@@ -95,12 +95,12 @@ int PriorityPCBQueue::remove() //access item in queue and remove it
 		return 0;
 	}
 	else           //if the queue is not empty
-	{	int tempPriority = head->getPriority(); // create tempPriority to return item at head of queue
+	{	int tempPCB_ID = head->getPCB_ID(); // create tempPCB_ID to return item at head of queue
 		PriorityPCBNode* tempPtr = head; // create tempPtr to delete the node head points to without deleting head
 		head = head->getNext(); //head now point to next node in list
 		delete tempPtr;      // the node that was at the head of the queue is now deleted
 		tempPtr = nullptr;   //tempPtr now point to nullptr 
-		return tempPriority;      //return the priority that was at the head of the queue
+		return tempPCB_ID;  //return the PCB_ID that was at the head of the queue
 	}
 }
 bool PriorityPCBQueue::isEmpty() const //test to see if queue is empty
@@ -109,4 +109,15 @@ bool PriorityPCBQueue::isEmpty() const //test to see if queue is empty
 		return true;
 	else              // if head ptr does not point to nullptr then it points to a node and the queue is not empty
 		return false;
+}
+void PriorityPCBQueue::readContents() const
+{	if(head == nullptr)
+	{	cout << "Priority Queue is empty\n";
+	}
+	else
+	{	for(PriorityPCBNode* reader = head; reader != nullptr; reader = reader->getNext())
+		{	cout << "Process ID:"<< reader->getPCB_ID() << " Priority:" << reader->getPriority() << endl;
+		}		
+	}
+	
 }

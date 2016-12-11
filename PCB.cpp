@@ -8,9 +8,9 @@ int PCB::getPCB_ID() const
 int PCB::getSize() const
 {	return size;
 }
-/*unsigned int PCB::getAddress() const
+int PCB::getAddress() const
 {	return address;
-}*/
+}
 void PCB::setPriority(int thePriority)
 {	priority = thePriority;
 }
@@ -20,6 +20,6 @@ void PCB::setPCB_ID(int thePCB_ID)
 void PCB::setSize(int theSize)
 {	size = theSize;
 }
-/*void PCB::setAddress(unsigned int theAddress)
+void PCB::setAddress(int theAddress)
 {	address = theAddress;
-}*/
+}
