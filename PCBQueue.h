@@ -21,7 +21,7 @@ class PCBNode
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 class PCBQueue
 {	public:
-		PCBQueue(string theDeviceName); //Initilizes the object to an empty queue and names the queue
+		PCBQueue(); //Initilizes the object to an empty queue and names the queue
 		
 		PCBQueue(const PCBQueue& aQueue); //copy constructor
 		

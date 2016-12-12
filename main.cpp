@@ -8,22 +8,16 @@
 #include "PCBQueue.h"
 
 
-bool memoryManagerAdd(PCB& newProcess, vector<PCB>& theProcesses);
+bool memoryManagerAdd(int& theProcess_ID, int& thePriority, int& theSize, vector<PCB>& theProcesses);
 bool memoryManagerRemove(int terminatedProcess, vector<PCB> theProcesses);
 void mergeEmptyMemory(vector<PCB> theProcesses);
 
 using namespace std;
 
 int main()
-{		
-	PriorityPCBQueue CPU; //ready queue
-	vector<PCBQueue> Disks; //I/O queues
-	vector<PCBQueue> Printers; //I/O queues
-	vector<PCB> Processes; //processes
-	//vector<MemorySegment> Memory;
-
+{
 	int numberOfPrinters, numberOfDisks, sizeOfMemory;
-	int priorityOfProcess, processID(0), sizeOfProcess, memoryAddress(0);
+	int priorityOfProcess, processID(1), sizeOfProcess, memoryAddress(0);
 	string command;
 
 	cout << "How many printers are there?" << endl;
@@ -33,6 +27,19 @@ int main()
 	cout << "How large is the memory" << endl;
 	cin >> sizeOfMemory;
 
+	PriorityPCBQueue CPU; //ready queue
+	vector<PCBQueue> Disks; //I/O queues
+	for(int i=0; i<numberOfDisks; ++i)
+	{	PCBQueue temp;
+		Disks.push_back(temp);
+	}
+	vector<PCBQueue> Printers; //I/O queues
+	for(int i=0; i<numberOfPrinters; ++i)
+	{	PCBQueue temp;
+		Printers.push_back(temp);
+	}
+	vector<PCB> Processes; //processes
+	
 	PCB empty(-1, -1, sizeOfMemory,memoryAddress); //initilizes one PCB to represent the empty memory at address 0
 	Processes.push_back(empty);	
 
@@ -40,25 +47,31 @@ int main()
 	{	cout << "Enter Command\n";
 		cin >> command;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-		if(command.size()>2)
+		while(command.size()>2)
 		{	cout << "Please enter a valid command\n";
+			cin >> command;
 		}		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-		else if(command == "A") //A indicated the arrival of a process
+		if(command == "A") //A indicated the arrival of a process
 		{	int temp1, temp2, temp3;
 			cout << "You have created a process, what is the process priority?\n";
 			cin >>temp1;
+			while(temp1 < 0)
+			{	cout << "The priority assigned must be a positive value, please enter another number\n";
+				cin >> temp1;
+			}
 
 			temp2 = processID;
 			processID++;
 			
 			cout << "What is the size of the process?\n";
-			cin >>temp3;
-		
-			PCB temp(temp1, temp2, temp3, memoryAddress); //creates temp PCB object
-			memoryManagerAdd(temp, Processes);//inserts new PCB into PCB<vector> Processes
-			memoryAddress += temp3;//increments address by size of process added
+			cin >>temp3;	
+			while(temp3 < 0)
+			{	cout << "The size assigned must be a positive value, please enter another number\n";
+				cin >> temp3;
+			}
 			
+			memoryManagerAdd(temp1, temp2, temp3, Processes);//inserts new PCB into PCB<vector> ProcessesS
 			CPU.add(temp1, temp2);
 		}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -87,7 +100,9 @@ int main()
 			{	int tempPCB_ID = Disks[value-1].remove();//removes process from I/O queue
 				for(int i=0; i<Processes.size(); ++i)
 				{	if(Processes[i].getPCB_ID() == tempPCB_ID)
-					{	CPU.add(Processes[i].getPriority(), Processes[i].getPCB_ID());//adds process to ready queue
+					{	int tempPriority = Processes[i].getPriority();
+						int tempPCB_ID = Processes[i].getPCB_ID();
+						CPU.add(tempPriority, tempPCB_ID);
 						break;
 					}
 				}
@@ -114,7 +129,9 @@ int main()
 			{	int tempPCB_ID = Printers[value-1].remove();//removes process from I/O queue
 				for(int i=0; i<Processes.size(); ++i)
 				{	if(Processes[i].getPCB_ID() == tempPCB_ID)
-					{	CPU.add(Processes[i].getPriority(), Processes[i].getPCB_ID());//adds process to ready queue
+					{	int tempPriority = Processes[i].getPriority();
+						int tempPCB_ID = Processes[i].getPCB_ID();
+						CPU.add(tempPriority, tempPCB_ID);//adds process to ready queue
 						break;
 					}
 				}	
@@ -122,7 +139,39 @@ int main()
 		}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 		else if(command == "S") //snapshot
-		{
+		{	cout << "Number of printers:" << numberOfPrinters << " Number of disks:" << numberOfDisks 
+		    << " Size of memory:" << sizeOfMemory << endl;
+			cout << "-------------------------------------------------------------------------------\n";
+			CPU.readContents(); //CPU and ready queue
+			cout << "-------------------------------------------------------------------------------\n";
+			if(Disks.empty())
+			{	cout << "Disks are empty------------------------------------------------------------\n";
+
+			}
+			if(Printers.empty())
+			{	cout << "Printers are empty---------------------------------------------------------\n";
+			}
+			for(int i=0; i<Disks.size(); ++i) //disk queues
+			{	cout << "Disk queue: " << i+1 << "\n";
+				Disks[i].readContents(); 	
+			}
+			cout << endl;
+			for(int i=0; i<Printers.size(); ++i) //printer queues
+			{	cout << "Printer queue: " << i+1 << "\n";
+				Printers[i].readContents();
+			}
+		
+			cout <<"Memory:-------------------------------------------------------------------------\n";
+			for(vector<PCB>::iterator it = Processes.begin(); it != Processes.end(); ++it)
+			{	if(it->getPriority()==-1)
+				{	cout<<"Empty "<<it->getAddress()<<"-"<<it->getAddress() + it->getSize()<<endl;
+				}
+				else
+				{	cout<<"PCD ID:" <<it->getPCB_ID()<<" "<<"Priority:"<<it->getPriority() <<" "<<
+					"size:"<<it->getSize() <<" "<<"address:"<<it->getAddress()<<"-"<<it->getSize() + it->getAddress()<<endl;
+				}
+			}
+			cout << "-------------------------------------------------------------------------------\n";				
 		}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////		
 		else if(command == "Sr")//show contents of ready-queue and PID of process using CPU
@@ -141,16 +190,17 @@ int main()
 		}
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 		else if(command == "Sm")//show state of memory
-		{		for(vector<PCB>::iterator it = Processes.begin(); it != Processes.end(); ++it)
-				{	if(it->getPriority()==-1)
-					{	cout<<"Empty "<<it->getAddress()<<"-"<<it->getAddress() + it->getSize()<<endl;
-					}
-					else
-					{
-						cout<<"PCD ID:" <<it->getPCB_ID()<<" "<<"Priority:"<<it->getPriority() <<" "<<
-					"size:"<<it->getSize() <<" "<<"address:"<<it->getAddress()<<"-"<<it->getSize() + it->getAddress()<<endl;
-					}
+		{	cout <<"Memory:" << endl;
+			
+			for(vector<PCB>::iterator it = Processes.begin(); it != Processes.end(); ++it)
+			{	if(it->getPriority()==-1)
+				{	cout<<"Empty "<<it->getAddress()<<"-"<<it->getAddress() + it->getSize()<<endl;
 				}
+				else
+				{	cout<<"PCD ID:" <<it->getPCB_ID()<<" "<<"Priority:"<<it->getPriority() <<" "<<
+					"size:"<<it->getSize() <<" "<<"address:"<<it->getAddress()<<"-"<<it->getSize() + it->getAddress()<<endl;
+				}
+			}
 		}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 		else//invalid command entered
@@ -167,12 +217,12 @@ return 0;
 //Memory Management Add function iterates through the PCB Vector and looks for the empty slots of memory,
 //which it identifies by a process ID of -1. It then looks to see which slot if the best fit for the
 //new process//////////////////////////////////////////////////////////////////////////////////////////
-bool memoryManagerAdd(PCB& newProcess, vector<PCB>& theProcesses)
+bool memoryManagerAdd(int& theProcess_ID, int& thePriority, int& theSize, vector<PCB>& theProcesses)
 {	bool success = false;
 
 	vector<PCB>::iterator newAddress = theProcesses.begin(); //points to beginning of array to begin search
 	
-	if( newAddress->getPCB_ID() == -1 && newAddress->getSize() >= newProcess.getSize() )
+	if( newAddress->getPCB_ID() == -1 && newAddress->getSize() >= theSize )
 	{
 		success = true; //newAddress defines an empty memory slot large enough to place the process
 	}	
@@ -186,7 +236,7 @@ bool memoryManagerAdd(PCB& newProcess, vector<PCB>& theProcesses)
 //assigned to a block of memory this function now does so and marks success as true indicating the process
 //has been allocated some memory/////////////////////////////////////////////////////////////////////
 	for(vector<PCB>::iterator it_1 = theProcesses.begin(); it_1 != theProcesses.end(); ++it_1)
-	{	if(it_1->getPCB_ID() == -1 && it_1->getSize() >= newProcess.getSize())
+	{	if(it_1->getPCB_ID() == -1 && it_1->getSize() >= theSize)
 		{	if(success == true && it_1->getSize() < newAddress->getSize())
 			{	newAddress = it_1;
 			}
@@ -204,44 +254,40 @@ bool memoryManagerAdd(PCB& newProcess, vector<PCB>& theProcesses)
 	}
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	int sizeDifference = newAddress->getSize() - newProcess.getSize();
+	int sizeDifference = newAddress->getSize() - theSize; //size of empty memory minus size of new process
 		
 	if(sizeDifference == 0) // If block of memory is a perfect fit for the new process
-	{	newAddress->setPriority(newProcess.getPriority()) ;
-		newAddress->setPCB_ID(newProcess.getPCB_ID());
+	{	newAddress->setPriority(thePriority); //now shifting of memory is needed since it is a perfect fit
+		newAddress->setPCB_ID(theProcess_ID);
 	} 
 	
 	if(sizeDifference != 0)
-	{	newAddress->setSize(sizeDifference);
-		int tempAddress = newAddress->getAddress()+sizeDifference;
-		newAddress->setAddress(tempAddress);
-		
-		theProcesses.insert(newAddress, newProcess); //Inserts process at newAddress location in vector
+	{	newAddress->setSize(sizeDifference); //sets size of empty memory space left over after process insert
+		int processAddress = newAddress->getAddress();
+		int emptyMemoryAddress = newAddress->getAddress()+theSize;//increments the block of empty memory
+		newAddress->setAddress(emptyMemoryAddress);//empty memory address is shifted to allow PCB to be inserted
+		 
+		PCB temp(thePriority, theProcess_ID, theSize, processAddress);
+		theProcesses.insert(newAddress, temp); //Inserts process at newAddress location in vector
 	}
 	return success;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool memoryManagerRemove(int terminatedProcess, vector<PCB> theProcesses)
 {	bool locatedProcess = false;
-	vector<PCB>::iterator theAddress = theProcesses.begin();
+	//vector<PCB>::iterator theAddress = theProcesses.begin();
 	
 	for(vector<PCB>::iterator it_1 = theProcesses.begin(); it_1 != theProcesses.end(); ++it_1)
 	{	if(it_1->getPCB_ID() == terminatedProcess)
 		{	locatedProcess = true;
-			theAddress = it_1;
+			it_1->setPriority(-1);
+			it_1->setPCB_ID(-1);
 			break;
 		}
 	}
-	if(locatedProcess == false)
-	{	cout << "could not locate the process to delete it." << endl;
-	}
-	else if(locatedProcess == true)
-	{	theAddress->setPriority(-1);
-		theAddress->setPCB_ID(-1);
-		
 		mergeEmptyMemory(theProcesses); //helper function to merge any sequential empty memory
-	}
-	return locatedProcess;
+		return locatedProcess;
+	
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////	
 void mergeEmptyMemory(vector<PCB> theProcesses)

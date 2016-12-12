@@ -2,8 +2,8 @@
 #include <iostream>
 using namespace std;
 
-PCBQueue::PCBQueue(string theDeviceName) //default constructor
-{	deviceName = theDeviceName;
+PCBQueue::PCBQueue() //default constructor
+{	//deviceName = theDeviceName;
 	head = nullptr;
 	tail = nullptr;
 }
@@ -98,7 +98,10 @@ void PCBQueue::readContents() const
 	{	cout << "Queue is empty\n";
 	}
 	else
-	{	for(PCBNode* reader = head; reader != nullptr; reader = reader->getNext())
+	{	cout << "Process using device:\n";
+		cout << "Process ID:"<< head->getPCB_ID() << endl;
+		cout << "Device queue:\n";
+		for(PCBNode* reader = head->getNext(); reader != nullptr; reader = reader->getNext())
 		{	cout << "Process ID:"<< reader->getPCB_ID() << endl;
 		}		
 	}	

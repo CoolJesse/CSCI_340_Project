@@ -115,7 +115,10 @@ void PriorityPCBQueue::readContents() const
 	{	cout << "Priority Queue is empty\n";
 	}
 	else
-	{	for(PriorityPCBNode* reader = head; reader != nullptr; reader = reader->getNext())
+	{	cout << "Process using CPU:\n";
+		cout << "Process ID:"<< head->getPCB_ID() << " Priority:" << head->getPriority() << endl;
+		cout << "Ready queue:\n";
+		for(PriorityPCBNode* reader = head->getNext(); reader != nullptr; reader = reader->getNext())
 		{	cout << "Process ID:"<< reader->getPCB_ID() << " Priority:" << reader->getPriority() << endl;
 		}		
 	}
